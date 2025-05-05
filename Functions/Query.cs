@@ -20,7 +20,7 @@ public class Query(ILogger<Query> logger)
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req,
         [SqlInput(InputQuery, "WebsitesWatcher")] IReadOnlyList<dynamic> websites)
     {
-        logger.LogInformation("C# HTTP trigger function processed a request.");
+        logger.LogInformation("C# HTTP trigger function processed a request.!!");
         return new OkObjectResult(websites);
     }
 }

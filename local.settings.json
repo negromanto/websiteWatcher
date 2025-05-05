@@ -7,7 +7,7 @@
         "GoogleSafeBrowsingApiKey": "AIzaSyCz4z01kiDhNztO9U40_hTiFmDJAJMyim8"
     },
     "ConnectionStrings": {
-        "WebsitesWatcher": "Data Source=localhost\\sqlexpress;Initial Catalog=WebsitesWatcher;Integrated Security=true;TrustServerCertificate=true",
+        "WebsitesWatcher": "Data Source=localhost\\sqlexpress;Initial Catalog=WebsitesWatcher;Integrated Security=true;TrustServerCertificate=true"
         //"WebsitesWatcherStorage": "UseDevelopmentStorage=true"
     }
 }
