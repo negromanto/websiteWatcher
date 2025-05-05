@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace websiteWatcher;
+namespace websiteWatcher.Functions;
 
 public class Snapshot(ILogger<Snapshot> logger)
 {

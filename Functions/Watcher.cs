@@ -6,10 +6,11 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
+using websiteWatcher.Services;
 
-namespace websiteWatcher;
+namespace websiteWatcher.Functions;
 
-public class Watcher(ILogger<Watcher> logger)
+public class Watcher(ILogger<Watcher> logger, PdfCreatorServices pdfCreatorServices)
 {
     private const string InputQuery = @"Select w.Id, w.Url, w.XPathExpression, s.Content AS LatestContent
                                 FROM dbo.Websites w
@@ -39,15 +40,28 @@ public class Watcher(ILogger<Watcher> logger)
             {
                 logger.LogInformation($"El contenido a cambiado");
 
-                var newPdf = await ConvertPageToPdfAsync(website.Url);
+                try
+                {
 
-                var connString = Environment.GetEnvironmentVariable("ConnectionStrings:WebsitesWatcherStorage");
-                var blobClient = new BlobClient(connString, "pdfs", $"{website.Id}-{DateTime.UtcNow:yyyyMMddhhmmss}.pdf");
-                await blobClient.UploadAsync(newPdf);
+                    var newPdf = await pdfCreatorServices.ConvertPageToPdfAsync(website.Url);
 
-                logger.LogInformation("El nuevo PDF ha sido creado");
+                    logger.LogInformation($"El pdf a sido creado en memoria y esta listo para guardarse");
 
-                result = new SnapshotRecord(website.Id, content);
+                    var connString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+
+                    logger.LogInformation($"La variable de entorno para AzureWebJobsStorage se obtubo correctamente");
+
+                    var blobClient = new BlobClient(connString, "pdfs", $"{website.Id}-{DateTime.UtcNow:yyyyMMddhhmmss}.pdf");
+                    await blobClient.UploadAsync(newPdf);
+
+                    logger.LogInformation("El nuevo PDF ha sido creado");
+
+                    result = new SnapshotRecord(website.Id, content);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Error al crear el PDF: {ex.Message}");
+                }
 
             }
         }
@@ -55,21 +69,21 @@ public class Watcher(ILogger<Watcher> logger)
         return result;
     }
 
-    private async Task<Stream> ConvertPageToPdfAsync(string url)
-    {
-        var browserFetcher = new BrowserFetcher();
+    //private async Task<Stream> ConvertPageToPdfAsync(string url)
+    //{
+    //    var browserFetcher = new BrowserFetcher();
 
-        await browserFetcher.DownloadAsync();
-        await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
-        await using var page = await browser.NewPageAsync();
-        await page.GoToAsync(url);
-        await page.EvaluateExpressionHandleAsync("document.fonts.ready");
-        var result = await page.PdfStreamAsync();
-        result.Position = 0;
+    //    await browserFetcher.DownloadAsync();
+    //    await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+    //    await using var page = await browser.NewPageAsync();
+    //    await page.GoToAsync(url);
+    //    await page.EvaluateExpressionHandleAsync("document.fonts.ready");
+    //    var result = await page.PdfStreamAsync();
+    //    result.Position = 0;
 
-        return result;
+    //    return result;
 
-    }
+    //}
 }
 
 

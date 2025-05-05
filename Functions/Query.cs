@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.Extensions.Logging;
 
-namespace websiteWatcher;
+namespace websiteWatcher.Functions;
 
 public class Query(ILogger<Query> logger)
 {

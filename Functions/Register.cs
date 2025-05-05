@@ -1,12 +1,10 @@
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.Extensions.Logging;
 
-namespace websiteWatcher;
+namespace websiteWatcher.Functions;
 
 public class Register(ILogger<Register> logger)
 {
@@ -22,6 +20,18 @@ public class Register(ILogger<Register> logger)
 
         Website newWebsite = JsonSerializer.Deserialize<Website>(requestBody, options);
         newWebsite.Id = Guid.NewGuid();
+
+
+        //lo siguiente ahora se maneja desde un middleware
+
+        //var result = safeBrowsingService.Check(newWebsite.Url);
+
+        //if (result.HasThreat)
+        //{
+        //    var threats = string.Join(" ", result.Threats);
+        //    logger.LogInformation($"El URL tiene las siguientes amenazas: {threats}");
+        //    return null;
+        //}
 
         //logger.LogInformation("C# HTTP trigger function processed a request.");
         return newWebsite;
